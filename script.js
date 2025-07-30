@@ -133,3 +133,31 @@ function searchProducts() {
   const keyword = document.getElementById('search-input').value;
   renderProducts(keyword);
 }
+function updateCart() {
+  const cartItemsElement = document.getElementById("cart-items");
+  cartItemsElement.innerHTML = "";
+
+  // Gom nhóm các sản phẩm theo id và đếm số lượng
+  const cartMap = {};
+  cart.forEach(item => {
+    if (cartMap[item.id]) {
+      cartMap[item.id].quantity += 1;
+    } else {
+      cartMap[item.id] = { ...item, quantity: 1 };
+    }
+  });
+
+  let total = 0;
+
+  // Hiển thị các sản phẩm trong giỏ
+  for (const id in cartMap) {
+    const item = cartMap[id];
+    const li = document.createElement("li");
+    li.textContent = `${item.name} x${item.quantity} - ${item.price * item.quantity}₫`;
+    cartItemsElement.appendChild(li);
+    total += item.price * item.quantity;
+  }
+
+  document.getElementById("total").textContent = `Tổng: ${total.toLocaleString()}₫`;
+}
+
