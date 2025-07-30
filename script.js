@@ -39,3 +39,65 @@ function updateCartUI() {
 }
 
 renderProducts();
+let users = []; // lưu tạm tài khoản
+let currentUser = null;
+
+function register() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const message = document.getElementById("auth-message");
+
+  if (!username || !password) {
+    message.textContent = "Vui lòng nhập đầy đủ!";
+    return;
+  }
+
+  if (users.find(u => u.username === username)) {
+    message.textContent = "Tài khoản đã tồn tại!";
+    return;
+  }
+
+  users.push({ username, password });
+  message.textContent = "Đăng ký thành công!";
+}
+
+function login() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const message = document.getElementById("auth-message");
+
+  const user = users.find(u => u.username === username && u.password === password);
+  if (user) {
+    currentUser = user;
+    document.getElementById("auth").style.display = "none";
+    document.getElementById("welcome-user").textContent = `Chào, ${currentUser.username}`;
+  } else {
+    message.textContent = "Sai thông tin đăng nhập!";
+  }
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById("auth").style.display = "block";
+  document.getElementById("welcome-user").textContent = "";
+  cart.length = 0;
+  renderCart();
+}
+
+function checkout() {
+  if (!currentUser) {
+    alert("Bạn cần đăng nhập trước khi mua hàng.");
+    return;
+  }
+
+  if (cart.length === 0) {
+    alert("Giỏ hàng trống.");
+    return;
+  }
+
+  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  alert(`Cảm ơn ${currentUser.username} đã mua hàng! Tổng đơn: ${total.toLocaleString()}₫`);
+  cart.length = 0;
+  renderCart();
+}
+
