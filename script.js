@@ -100,3 +100,54 @@ function updateCartUI() {
 }
 
 renderProducts();
+function renderProducts(filter = "") {
+  const productList = document.getElementById('product-list');
+  productList.innerHTML = ''; // clear cũ
+
+  const filteredProducts = products.filter(p =>
+    p.name.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  filteredProducts.forEach(product => {
+    const div = document.createElement('div');
+    div.className = 'product';
+    div.innerHTML = `
+      <img src="${product.image}" alt="${product.name}">
+      <h3>${product.name}</h3>
+      <p>${product.price.toLocaleString()}₫</p>
+      <button onclick="addToCart(${product.id})">Thêm vào giỏ</button>
+    `;
+    productList.appendChild(div);
+  });
+}
+
+function searchProducts() {
+  const keyword = document.getElementById('search-input').value;
+  renderProducts(keyword);
+}
+function renderProducts(filter = "") {
+  const productList = document.getElementById('product-list');
+  productList.innerHTML = ''; // clear cũ
+
+  const filteredProducts = products.filter(p =>
+    p.name.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  filteredProducts.forEach(product => {
+    const div = document.createElement('div');
+    div.className = 'product';
+    div.innerHTML = `
+      <img src="${product.image}" alt="${product.name}">
+      <h3>${product.name}</h3>
+      <p>${product.price.toLocaleString()}₫</p>
+      <button onclick="addToCart(${product.id})">Thêm vào giỏ</button>
+    `;
+    productList.appendChild(div);
+  });
+}
+
+function searchProducts() {
+  const keyword = document.getElementById('search-input').value;
+  renderProducts(keyword);
+}
+
