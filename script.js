@@ -1,245 +1,75 @@
-let users = []; // lưu tạm tài khoản
+// Danh sách sản phẩm mẫu
+const products = [
+  { id: 1, name: "Chuột Gaming", price: 200000 },
+  { id: 2, name: "Tai nghe Bluetooth", price: 350000 },
+  { id: 3, name: "Bàn phím cơ", price: 800000 },
+  { id: 4, name: "Laptop Dell XPS", price: 20000000 },
+  { id: 5, name: "Màn hình LG 24inch", price: 3000000 },
+  { id: 6, name: "Ổ cứng SSD 512GB", price: 1500000 }
+];
+
 let currentUser = null;
+let cart = [];
 
-function register() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const message = document.getElementById("auth-message");
-
-  if (!username || !password) {
-    message.textContent = "Vui lòng nhập đầy đủ!";
-    return;
-  }
-
+// Đăng ký người dùng mới (chỉ lưu trong localStorage)
+function register(username, password) {
+  const users = JSON.parse(localStorage.getItem("users") || "[]");
   if (users.find(u => u.username === username)) {
-    message.textContent = "Tài khoản đã tồn tại!";
+    alert("Tài khoản đã tồn tại!");
     return;
   }
-
-  users.push({ username, password });
-  message.textContent = "Đăng ký thành công!";
+  users.push({ username, password, orders: [], isAdmin: false });
+  localStorage.setItem("users", JSON.stringify(users));
+  alert("Đăng ký thành công!");
 }
 
-function login() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const message = document.getElementById("auth-message");
-
+// Đăng nhập tài khoản
+function login(username, password) {
+  const users = JSON.parse(localStorage.getItem("users") || "[]");
   const user = users.find(u => u.username === username && u.password === password);
   if (user) {
     currentUser = user;
-    document.getElementById("auth").style.display = "none";
-    document.getElementById("welcome-user").textContent = `Chào, ${currentUser.username}`;
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    alert("Đăng nhập thành công");
+    renderCart();
+    renderOrders();
+    if (user.isAdmin) renderAllOrders();
   } else {
-    message.textContent = "Sai thông tin đăng nhập!";
+    alert("Sai tên đăng nhập hoặc mật khẩu!");
   }
 }
 
+// Đăng xuất
 function logout() {
   currentUser = null;
-  document.getElementById("auth").style.display = "block";
-  document.getElementById("welcome-user").textContent = "";
-  cart.length = 0;
-  renderCart();
+  localStorage.removeItem("currentUser");
+  alert("Đã đăng xuất!");
+  location.reload();
 }
 
-function checkout() {
-  if (!currentUser) {
-    alert("Bạn cần đăng nhập trước khi mua hàng.");
-    return;
-  }
-
-  if (cart.length === 0) {
-    alert("Giỏ hàng trống.");
-    return;
-  }
-
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
-  alert(`Cảm ơn ${currentUser.username} đã mua hàng! Tổng đơn: ${total.toLocaleString()}₫`);
-  cart.length = 0;
-  renderCart();
-}
-const products = [
-  { id: 1, name: "Tai nghe Bluetooth", price: 150000, image: "https://via.placeholder.com/200x150?text=Tai+Nghe" },
-  { id: 2, name: "Chuột Gaming", price: 200000, image: "https://via.placeholder.com/200x150?text=Chuột" },
-  { id: 3, name: "Bàn phím cơ", price: 450000, image: "https://via.placeholder.com/200x150?text=B%C3%A0n+Ph%C3%ADm" },
-  { id: 4, name: "Màn hình 24 inch", price: 2400000, image: "https://via.placeholder.com/200x150?text=M%C3%A0n+H%C3%ACnh" },
-  { id: 5, name: "Ổ cứng SSD 512GB", price: 1100000, image: "https://via.placeholder.com/200x150?text=SSD+512GB" },
-  { id: 6, name: "RAM 16GB DDR4", price: 1350000, image: "https://via.placeholder.com/200x150?text=RAM+16GB" },
-  { id: 7, name: "Laptop Văn phòng", price: 8500000, image: "https://via.placeholder.com/200x150?text=Laptop" },
-  { id: 8, name: "Webcam Full HD", price: 390000, image: "https://via.placeholder.com/200x150?text=Webcam" },
-  { id: 9, name: "Loa Bluetooth Mini", price: 180000, image: "https://via.placeholder.com/200x150?text=Loa+Bluetooth" },
-  { id: 10, name: "Micro thu âm", price: 320000, image: "https://via.placeholder.com/200x150?text=Micro" },
-  { id: 11, name: "Bộ phát WiFi TP-Link", price: 420000, image: "https://via.placeholder.com/200x150?text=WiFi+Router" },
-  { id: 12, name: "Bàn nâng laptop", price: 260000, image: "https://via.placeholder.com/200x150?text=B%C3%A0n+Laptop" }
-];
-
-const cart = [];
-
-function renderProducts() {
-  const productList = document.getElementById('product-list');
-  products.forEach(product => {
-    const div = document.createElement('div');
-    div.className = 'product';
-    div.innerHTML = `
-      <img src="${product.image}" alt="${product.name}">
-      <h3>${product.name}</h3>
-      <p>${product.price.toLocaleString()}₫</p>
-      <button onclick="addToCart(${product.id})">Thêm vào giỏ</button>
-    `;
-    productList.appendChild(div);
-  });
-}
-
-function addToCart(id) {
-  const product = products.find(p => p.id === id);
+// Thêm sản phẩm vào giỏ hàng
+function addToCart(productId) {
+  const product = products.find(p => p.id === productId);
   cart.push(product);
-  updateCartUI();
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCart();
 }
 
-function updateCartUI() {
-  document.getElementById('cart-count').innerText = cart.length;
-  const cartItems = document.getElementById('cart-items');
-  cartItems.innerHTML = '';
-  cart.forEach((item, index) => {
-    const li = document.createElement('li');
-    li.textContent = `${index + 1}. ${item.name} - ${item.price.toLocaleString()}₫`;
-    cartItems.appendChild(li);
-  });
-}
-
-renderProducts();
-function renderProducts(filter = "") {
-  const productList = document.getElementById('product-list');
-  productList.innerHTML = ''; // clear cũ
-
-  const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(filter.toLowerCase())
-  );
-
-  filteredProducts.forEach(product => {
-    const div = document.createElement('div');
-    div.className = 'product';
-    div.innerHTML = `
-      <img src="${product.image}" alt="${product.name}">
-      <h3>${product.name}</h3>
-      <p>${product.price.toLocaleString()}₫</p>
-      <button onclick="addToCart(${product.id})">Thêm vào giỏ</button>
-    `;
-    productList.appendChild(div);
-  });
-}
-
-function searchProducts() {
-  const keyword = document.getElementById('search-input').value;
-  renderProducts(keyword);
-}
-//lưu đơn hàng
-const orders = []; // lưu đơn hàng đã mua
-//cập nhật hàng checkout
-function checkout() {
-  if (!currentUser) {
-    alert("Bạn cần đăng nhập trước khi mua hàng.");
-    return;
-  }
-
-  if (cart.length === 0) {
-    alert("Giỏ hàng trống.");
-    return;
-  }
-
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
-  alert(`Cảm ơn ${currentUser.username} đã mua hàng! Tổng đơn: ${total.toLocaleString()}₫`);
-
-  // Lưu đơn hàng vào danh sách đơn
-  const order = {
-    user: currentUser.username,
-    items: [...cart],
-    total,
-    date: new Date().toLocaleString()
-  };
-  orders.push(order);
-  renderOrders();
-
-  // Xóa giỏ hàng
-  cart.length = 0;
-  renderCart();
-}
-//them hàm renderorders
-function renderOrders() {
-  const orderList = document.getElementById("order-list");
-  orderList.innerHTML = "";
-
-  if (orders.length === 0) {
-    orderList.innerHTML = "<li>Chưa có đơn hàng nào.</li>";
-    return;
-  }
-
-  orders.forEach((order, index) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <strong>Đơn ${index + 1}:</strong> (${order.date})<br>
-      ${order.items.map(i => `- ${i.name} (${i.price.toLocaleString()}₫)`).join("<br>")}
-      <br><strong>Tổng: ${order.total.toLocaleString()}₫</strong><hr>
-    `;
-    orderList.appendChild(li);
-  });
-}
-//Gọi renderOrders() khi người dùng đăng nhập lại:
-renderOrders();
-//1. Load đơn hàng từ localStorage khi mở trang
-//Thêm đầu file:
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-//2. Lưu đơn hàng vào localStorage mỗi khi checkout
-  orders.push(order);
-  localStorage.setItem("orders", JSON.stringify(orders)); // lưu vào localStorage
-  renderOrders();
-// 3. Lọc đơn hàng theo tài khoản đang đăng nhập
-function renderOrders() {
-  const orderList = document.getElementById("order-list");
-  orderList.innerHTML = "";
-
-  if (!currentUser) {
-    orderList.innerHTML = "<li>Vui lòng đăng nhập để xem đơn hàng.</li>";
-    return;
-  }
-
-  const userOrders = orders.filter(order => order.user === currentUser.username);
-
-  if (userOrders.length === 0) {
-    orderList.innerHTML = "<li>Chưa có đơn hàng nào.</li>";
-    return;
-  }
-
-  userOrders.forEach((order, index) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <strong>Đơn ${index + 1}:</strong> (${order.date})<br>
-      ${order.items.map(i => `- ${i.name} (${i.price.toLocaleString()}₫)`).join("<br>")}
-      <br><strong>Tổng: ${order.total.toLocaleString()}₫</strong><hr>
-    `;
-    orderList.appendChild(li);
-  });
-}
-
-renderOrders();
+// Cập nhật giao diện giỏ hàng
 function updateCart() {
   const cartItemsElement = document.getElementById("cart-items");
   cartItemsElement.innerHTML = "";
 
-  // Gom nhóm các sản phẩm và đếm số lượng
   const cartMap = {};
   cart.forEach(item => {
     if (cartMap[item.id]) {
-      cartMap[item.id].quantity += 1;
+      cartMap[item.id].quantity++;
     } else {
       cartMap[item.id] = { ...item, quantity: 1 };
     }
   });
 
   let total = 0;
-
-  // Hiển thị từng sản phẩm với số lượng
   for (const id in cartMap) {
     const item = cartMap[id];
     const li = document.createElement("li");
@@ -250,14 +80,98 @@ function updateCart() {
 
   document.getElementById("total").textContent = `Tổng: ${total.toLocaleString()}₫`;
 }
-function addToCart(productId) {
-  const product = products.find(p => p.id === productId);
-  cart.push(product);
-  localStorage.setItem("cart", JSON.stringify(cart)); // nếu có lưu localStorage
-  updateCart(); // 🟢 phải có dòng này
+
+// Hiển thị danh sách sản phẩm
+function renderProducts() {
+  const productsElement = document.getElementById("products");
+  productsElement.innerHTML = "";
+
+  products.forEach(product => {
+    const div = document.createElement("div");
+    div.className = "product";
+    div.innerHTML = `
+      <h3>${product.name}</h3>
+      <p>${product.price.toLocaleString()}₫</p>
+      <button onclick="addToCart(${product.id})">Thêm vào giỏ</button>
+    `;
+    productsElement.appendChild(div);
+  });
 }
 
-updateCart();
+// Xác nhận mua hàng (checkout)
+function checkout() {
+  if (!currentUser) {
+    alert("Vui lòng đăng nhập để mua hàng.");
+    return;
+  }
+  if (cart.length === 0) {
+    alert("Giỏ hàng trống.");
+    return;
+  }
 
+  const users = JSON.parse(localStorage.getItem("users"));
+  const index = users.findIndex(u => u.username === currentUser.username);
+  users[index].orders = users[index].orders.concat(cart);
+  localStorage.setItem("users", JSON.stringify(users));
+  cart = [];
+  localStorage.removeItem("cart");
+  alert("Đặt hàng thành công!");
+  updateCart();
+  renderOrders();
+  if (currentUser.isAdmin) renderAllOrders();
+}
 
+// Hiển thị đơn hàng của người dùng
+function renderOrders() {
+  if (!currentUser || currentUser.isAdmin) return;
 
+  const users = JSON.parse(localStorage.getItem("users"));
+  const user = users.find(u => u.username === currentUser.username);
+
+  const ordersElement = document.getElementById("my-orders");
+  ordersElement.innerHTML = "<h3>Đơn hàng của tôi</h3>";
+  user.orders.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.textContent = `${item.name} - ${item.price.toLocaleString()}₫`;
+    ordersElement.appendChild(li);
+  });
+}
+
+// ADMIN: Hiển thị tất cả đơn hàng
+function renderAllOrders() {
+  const allOrdersElement = document.getElementById("all-orders");
+  if (!allOrdersElement || !currentUser || !currentUser.isAdmin) return;
+
+  allOrdersElement.innerHTML = "<h3>Đơn hàng của tất cả người dùng</h3>";
+
+  const users = JSON.parse(localStorage.getItem("users"));
+  users.forEach(user => {
+    if (user.orders.length > 0) {
+      const userDiv = document.createElement("div");
+      userDiv.innerHTML = `<h4>${user.username}</h4>`;
+      const ul = document.createElement("ul");
+      user.orders.forEach(order => {
+        const li = document.createElement("li");
+        li.textContent = `${order.name} - ${order.price.toLocaleString()}₫`;
+        ul.appendChild(li);
+      });
+      userDiv.appendChild(ul);
+      allOrdersElement.appendChild(userDiv);
+    }
+  });
+}
+
+// Khởi tạo lại từ localStorage khi tải trang
+window.onload = () => {
+  renderProducts();
+  const savedCart = JSON.parse(localStorage.getItem("cart"));
+  if (savedCart) cart = savedCart;
+  updateCart();
+
+  const savedUser = JSON.parse(localStorage.getItem("currentUser"));
+  if (savedUser) {
+    currentUser = savedUser;
+    renderOrders();
+    if (currentUser.isAdmin) renderAllOrders();
+  }
+};
