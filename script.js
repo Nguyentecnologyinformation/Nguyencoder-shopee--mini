@@ -73,6 +73,7 @@ const products = [
   { id: 11, name: "Bộ phát WiFi TP-Link", price: 420000, image: "https://via.placeholder.com/200x150?text=WiFi+Router" },
   { id: 12, name: "Bàn nâng laptop", price: 260000, image: "https://via.placeholder.com/200x150?text=B%C3%A0n+Laptop" }
 ];
+];
 const cart = [];
 
 function renderProducts() {
