@@ -73,6 +73,7 @@ const products = [
   { id: 11, name: "Bộ phát WiFi TP-Link", price: 420000, image: "https://via.placeholder.com/200x150?text=WiFi+Router" },
   { id: 12, name: "Bàn nâng laptop", price: 260000, image: "https://via.placeholder.com/200x150?text=B%C3%A0n+Laptop" }
 ];
+
 const cart = [];
 
 function renderProducts() {
@@ -133,11 +134,100 @@ function searchProducts() {
   const keyword = document.getElementById('search-input').value;
   renderProducts(keyword);
 }
+//lưu đơn hàng
+const orders = []; // lưu đơn hàng đã mua
+//cập nhật hàng checkout
+function checkout() {
+  if (!currentUser) {
+    alert("Bạn cần đăng nhập trước khi mua hàng.");
+    return;
+  }
+
+  if (cart.length === 0) {
+    alert("Giỏ hàng trống.");
+    return;
+  }
+
+  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  alert(`Cảm ơn ${currentUser.username} đã mua hàng! Tổng đơn: ${total.toLocaleString()}₫`);
+
+  // Lưu đơn hàng vào danh sách đơn
+  const order = {
+    user: currentUser.username,
+    items: [...cart],
+    total,
+    date: new Date().toLocaleString()
+  };
+  orders.push(order);
+  renderOrders();
+
+  // Xóa giỏ hàng
+  cart.length = 0;
+  renderCart();
+}
+//them hàm renderorders
+function renderOrders() {
+  const orderList = document.getElementById("order-list");
+  orderList.innerHTML = "";
+
+  if (orders.length === 0) {
+    orderList.innerHTML = "<li>Chưa có đơn hàng nào.</li>";
+    return;
+  }
+
+  orders.forEach((order, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <strong>Đơn ${index + 1}:</strong> (${order.date})<br>
+      ${order.items.map(i => `- ${i.name} (${i.price.toLocaleString()}₫)`).join("<br>")}
+      <br><strong>Tổng: ${order.total.toLocaleString()}₫</strong><hr>
+    `;
+    orderList.appendChild(li);
+  });
+}
+//Gọi renderOrders() khi người dùng đăng nhập lại:
+renderOrders();
+//1. Load đơn hàng từ localStorage khi mở trang
+//Thêm đầu file:
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+//2. Lưu đơn hàng vào localStorage mỗi khi checkout
+  orders.push(order);
+  localStorage.setItem("orders", JSON.stringify(orders)); // lưu vào localStorage
+  renderOrders();
+// 3. Lọc đơn hàng theo tài khoản đang đăng nhập
+function renderOrders() {
+  const orderList = document.getElementById("order-list");
+  orderList.innerHTML = "";
+
+  if (!currentUser) {
+    orderList.innerHTML = "<li>Vui lòng đăng nhập để xem đơn hàng.</li>";
+    return;
+  }
+
+  const userOrders = orders.filter(order => order.user === currentUser.username);
+
+  if (userOrders.length === 0) {
+    orderList.innerHTML = "<li>Chưa có đơn hàng nào.</li>";
+    return;
+  }
+
+  userOrders.forEach((order, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <strong>Đơn ${index + 1}:</strong> (${order.date})<br>
+      ${order.items.map(i => `- ${i.name} (${i.price.toLocaleString()}₫)`).join("<br>")}
+      <br><strong>Tổng: ${order.total.toLocaleString()}₫</strong><hr>
+    `;
+    orderList.appendChild(li);
+  });
+}
+
+renderOrders();
 function updateCart() {
   const cartItemsElement = document.getElementById("cart-items");
   cartItemsElement.innerHTML = "";
 
-  // Gom nhóm các sản phẩm theo id và đếm số lượng
+  // Gom nhóm các sản phẩm và đếm số lượng
   const cartMap = {};
   cart.forEach(item => {
     if (cartMap[item.id]) {
@@ -149,7 +239,7 @@ function updateCart() {
 
   let total = 0;
 
-  // Hiển thị các sản phẩm trong giỏ
+  // Hiển thị từng sản phẩm với số lượng
   for (const id in cartMap) {
     const item = cartMap[id];
     const li = document.createElement("li");
@@ -160,4 +250,14 @@ function updateCart() {
 
   document.getElementById("total").textContent = `Tổng: ${total.toLocaleString()}₫`;
 }
+function addToCart(productId) {
+  const product = products.find(p => p.id === productId);
+  cart.push(product);
+  localStorage.setItem("cart", JSON.stringify(cart)); // nếu có lưu localStorage
+  updateCart(); // 🟢 phải có dòng này
+}
+
+updateCart();
+
+
 
