@@ -1,4 +1,3 @@
-
 let users = []; // lưu tạm tài khoản
 let currentUser = null;
 
