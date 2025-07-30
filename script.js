@@ -1,10 +1,17 @@
 const products = [
-  { id: 1, name: "Chuột Logitech", price: 150000, image: "https://via.placeholder.com/150" },
-  { id: 2, name: "Bàn phím cơ", price: 500000, image: "https://via.placeholder.com/150" },
-  { id: 3, name: "Tai nghe Bluetooth", price: 350000, image: "https://via.placeholder.com/150" },
-  { id: 4, name: "Màn hình 24in", price: 2200000, image: "https://via.placeholder.com/150" }
+  { id: 1, name: "Tai nghe Bluetooth", price: 150000, image: "https://via.placeholder.com/200x150?text=Tai+Nghe" },
+  { id: 2, name: "Chuột Gaming", price: 200000, image: "https://via.placeholder.com/200x150?text=Chuột" },
+  { id: 3, name: "Bàn phím cơ", price: 450000, image: "https://via.placeholder.com/200x150?text=B%C3%A0n+Ph%C3%ADm" },
+  { id: 4, name: "Màn hình 24 inch", price: 2400000, image: "https://via.placeholder.com/200x150?text=M%C3%A0n+H%C3%ACnh" },
+  { id: 5, name: "Ổ cứng SSD 512GB", price: 1100000, image: "https://via.placeholder.com/200x150?text=SSD+512GB" },
+  { id: 6, name: "RAM 16GB DDR4", price: 1350000, image: "https://via.placeholder.com/200x150?text=RAM+16GB" },
+  { id: 7, name: "Laptop Văn phòng", price: 8500000, image: "https://via.placeholder.com/200x150?text=Laptop" },
+  { id: 8, name: "Webcam Full HD", price: 390000, image: "https://via.placeholder.com/200x150?text=Webcam" },
+  { id: 9, name: "Loa Bluetooth Mini", price: 180000, image: "https://via.placeholder.com/200x150?text=Loa+Bluetooth" },
+  { id: 10, name: "Micro thu âm", price: 320000, image: "https://via.placeholder.com/200x150?text=Micro" },
+  { id: 11, name: "Bộ phát WiFi TP-Link", price: 420000, image: "https://via.placeholder.com/200x150?text=WiFi+Router" },
+  { id: 12, name: "Bàn nâng laptop", price: 260000, image: "https://via.placeholder.com/200x150?text=B%C3%A0n+Laptop" }
 ];
-
 const cart = [];
 
 function renderProducts() {
