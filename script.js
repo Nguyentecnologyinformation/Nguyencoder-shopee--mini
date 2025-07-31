@@ -216,3 +216,24 @@ function renderOrders() {
 }
 renderOrders();
 localStorage.removeItem("orders");
+function updateCartIcon() {
+  const cartCountElement = document.getElementById("cart-count");
+  cartCountElement.textContent = cart.length;
+}
+updateCart();
+updateCartIcon(); // 👈 dòng này để cập nhật số trên icon giỏ hàng
+function searchProducts() {
+  const input = document.getElementById("search-input").value.toLowerCase();
+  const productElements = document.querySelectorAll(".product-item");
+  
+  productElements.forEach(item => {
+    const name = item.querySelector("h3").textContent.toLowerCase();
+    if (name.includes(input)) {
+      item.style.display = "block";
+    } else {
+      item.style.display = "none";
+    }
+  });
+}
+
+
