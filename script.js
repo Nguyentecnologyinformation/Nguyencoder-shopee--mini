@@ -222,3 +222,5 @@ function updateCartIcon() {
 }
 updateCart();
 updateCartIcon(); // 👈 dòng này để cập nhật số trên icon giỏ hàng
+{ id: 1, name: "Tai nghe", price: 150000, img: "tainghe.jpg" }
+
