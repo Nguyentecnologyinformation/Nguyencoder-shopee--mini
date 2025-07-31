@@ -21,6 +21,39 @@
   <div id="search-box">
     <input type="text" id="search-input" placeholder="🔍 Tìm sản phẩm..." oninput="searchProducts()">
   </div>
+  <!-- THANH TÌM KIẾM VÀ GIỎ HÀNG -->
+<div style="display: flex; justify-content: center; align-items: center; gap: 10px; padding: 10px; background-color: #f94f2c;">
+  <!-- Thanh tìm kiếm -->
+  <div style="flex: 1; display: flex; align-items: center; background-color: white; border-radius: 20px; padding: 5px 10px;">
+    <input
+      id="search-input"
+      type="text"
+      placeholder="Tìm kiếm sản phẩm..."
+      oninput="searchProducts()"
+      style="flex: 1; border: none; outline: none; font-size: 16px;"
+    />
+    <!-- Biểu tượng máy ảnh -->
+    <span style="cursor: pointer;" onclick="alert('Tính năng tìm ảnh chưa hỗ trợ')">
+      <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" alt="Camera" width="24" height="24">
+    </span>
+  </div>
+
+  <!-- Biểu tượng giỏ hàng -->
+  <div style="cursor: pointer; position: relative;" onclick="toggleCart()">
+    <img src="https://cdn-icons-png.flaticon.com/512/263/263142.png" alt="Cart" width="32" height="32">
+    <span id="cart-count" style="
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: yellow;
+      color: black;
+      border-radius: 50%;
+      font-size: 12px;
+      padding: 2px 6px;
+    ">0</span>
+  </div>
+</div>
+
 
   <!-- PHẦN CHÍNH -->
   <main>
