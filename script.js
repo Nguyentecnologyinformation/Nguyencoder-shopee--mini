@@ -13,7 +13,6 @@ const products = [
   { id: 12, name: "Bàn nâng laptop", price: 260000, image: "https://via.placeholder.com/200x150?text=B%C3%A0n+Laptop" }
 ];
 const cart = [];
-
 function renderProducts() {
   const productList = document.getElementById("product-list");
   products.forEach(product => {
